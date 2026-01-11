@@ -1,0 +1,288 @@
+﻿@model IEnumerable<Kyueng.Models.Student>
+
+@{
+    ViewData["Title"] = "View Students";
+    var searchTerm = Context.Request.Query["search"].ToString();
+}
+
+<style>
+    body {
+        background-color: #F4F5FA;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    h2 {
+        color: #483D8B;
+        font-weight: 600;
+        font-size: 2.2rem;
+    }
+
+    .input-group input {
+        border-radius: 0.75rem 0 0 0.75rem;
+        border: 1px solid #ced4da;
+        font-size: 1rem;
+        padding: 0.75rem 1rem;
+    }
+
+    .btn-outline-primary {
+        border-radius: 0 0.75rem 0.75rem 0;
+        font-weight: 500;
+        color: #483D8B;
+        border-color: #483D8B;
+        transition: 0.3s ease;
+    }
+
+        .btn-outline-primary:hover {
+            background-color: #483D8B;
+            color: white;
+        }
+
+    .alert-danger,
+    .alert-success {
+        max-width: 700px;
+        margin: 1rem auto;
+        font-size: 1rem;
+        border-left: 5px solid;
+        padding: 1rem 1.25rem;
+        border-radius: 0.75rem;
+    }
+
+    .alert-danger {
+        background-color: #fdecea;
+        color: #8a1f11;
+        border-color: #dc3545;
+    }
+
+    .alert-success {
+        background-color: #e9f8f1;
+        color: #1e5631;
+        border-color: #28a745;
+    }
+
+    .card {
+        border-radius: 1rem;
+        overflow: hidden;
+        border: none;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+        .table thead {
+            background-color: #483D8B;
+            color: black;
+        }
+
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle;
+            font-size: 1rem;
+            padding: 1rem;
+        }
+
+    .table-hover tbody tr:hover {
+        background-color: #f1f3f9;
+    }
+
+    .btn-outline-primary,
+    .btn-outline-danger {
+        border-radius: 0.5rem;
+        font-size: 0.9rem;
+        padding: 0.45rem 0.75rem;
+    }
+
+        .btn-outline-danger:hover {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+    .modal-content {
+        border-radius: 1rem;
+    }
+
+    .modal-title {
+        font-weight: 600;
+        color: #483D8B;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        border: none;
+        transition: background-color 0.2s ease;
+    }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+    .btn-outline-secondary {
+        border-radius: 0.5rem;
+    }
+</style>
+
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">🎓 Student Directory</h2>
+    </div>
+
+    <form method="get" asp-action="ViewStudents" class="mb-4">
+        <div class="input-group shadow-sm" style="max-width: 500px;">
+            <input type="text" name="search" class="form-control" placeholder="🔍 Search by name..." value="@searchTerm" />
+            <button type="submit" class="btn btn-outline-primary">Search</button>
+        </div>
+    </form>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Course</th>
+                        <th>Year</th>
+                        <th>RFID</th>
+                        <th class="text-center"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var student in Model)
+                    {
+                        <tr>
+                            <td>@student.StudentId</td>
+                            <td>@student.FullName</td>
+                            <td>@student.Email</td>
+                            <td>@student.Course</td>
+                            <td>@student.Year</td>
+                            <td>@student.RFIDUID</td>
+                            <td class="text-center">
+                                <button type="button" class="btn btn-sm btn-outline-primary me-1"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editStudentModal"
+                                        data-student-id="@student.Id">
+                                    <i class="fas fa-pen"></i> Edit
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#confirmDeleteModal"
+                                        data-student-id="@student.Id">
+                                    <i class="fas fa-trash-alt"></i> Delete
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Student Modal -->
+<div class="modal fade" id="editStudentModal" tabindex="-1" aria-labelledby="editStudentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content shadow">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editStudentModalLabel">Edit Student</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="editStudentContent">
+                <!-- Loaded via AJAX -->
+                <div class="text-center text-muted">Loading...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content shadow">
+            <form method="post" asp-action="DeleteConfirmed">
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger" id="confirmDeleteModalLabel">Delete Confirmation</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-3">Are you sure you want to permanently delete this student record?</p>
+                    <input type="hidden" id="deleteStudentId" name="id" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const editModal = document.getElementById('editStudentModal');
+        editModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const studentId = button.getAttribute('data-student-id');
+
+            fetch(`/Student/Edit/${studentId}`)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('editStudentContent').innerHTML = html;
+                });
+        });
+
+        const deleteModal = document.getElementById('confirmDeleteModal');
+        deleteModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const studentId = button.getAttribute('data-student-id');
+            document.getElementById('deleteStudentId').value = studentId;
+        });
+
+             document.addEventListener('submit', async function (e) {
+            if (e.target.matches('#editStudentForm')) {
+                e.preventDefault();
+
+                const form = e.target;
+                const formData = new FormData(form);
+                const action = form.getAttribute('action');
+
+                // Clear any previous errors
+                form.querySelectorAll('[data-valmsg-for]').forEach(span => {
+                    span.textContent = '';
+                });
+
+                const response = await fetch(action, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // ✅ Success: close modal and reload page
+                    bootstrap.Modal.getInstance(document.getElementById('editStudentModal')).hide();
+                    location.reload();
+                } else {
+                    // ❌ Error: display validation messages
+                    for (const field in result.errors) {
+                        const span = form.querySelector(`[data-valmsg-for="${field}"]`);
+                        if (span) {
+                            span.textContent = result.errors[field][0];
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+}

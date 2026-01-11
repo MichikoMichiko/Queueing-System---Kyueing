@@ -1,0 +1,203 @@
+﻿@model Kyueng.Models.Student
+
+@{
+    ViewData["Title"] = "Register";
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
+
+<style>
+
+
+    form {
+        max-width: 800px;
+        margin: 1rem auto;
+        background: white;
+        padding: 2rem;
+        border-radius: 1.5rem;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    h2 {
+        text-align: center;
+        font-size: 2.5rem;
+        color: #483D8B;
+        font-weight: 600;
+        margin-bottom: 2rem;
+    }
+
+    label {
+        font-weight: 500;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .form-control {
+        font-size: 1.1rem;
+        padding: 0.75rem 1rem;
+        border-radius: 0.75rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid #ccc;
+        width: 100%;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .form-control:focus {
+            border-color: #6A5ACD;
+            box-shadow: 0 0 0 4px rgba(106, 90, 205, 0.1);
+            outline: none;
+        }
+
+    .btn-primary {
+        font-size: 1.2rem;
+        padding: 0.75rem 2rem;
+        border-radius: 0.75rem;
+        background-color: #6A5ACD;
+    }
+
+        .btn-primary:hover {
+            background-color: #5A4DA0;
+            transform: translateY(-2px);
+        }
+
+    .alert-info {
+        max-width: 800px;
+        margin: 1rem auto;
+        font-size: 1.1rem;
+        background-color: #f0f4ff;
+        border-left: 5px solid #6A5ACD;
+        padding: 1rem;
+        color: #333;
+        border-radius: 0.75rem;
+    }
+
+    .text-danger {
+        font-size: 0.95rem;
+        color: #d9534f;
+    }
+</style>
+
+
+<h2>Student Registration</h2>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-info">@TempData["Message"]</div>
+}
+
+<form asp-action="Register" method="post">
+    <div class="form-group">
+        <label>Student ID</label>
+        <input asp-for="StudentId" class="form-control" />
+        <span asp-validation-for="StudentId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label>Full Name</label>
+        <input asp-for="FullName" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Email</label>
+        <input asp-for="Email" class="form-control" type="email" required />
+
+    </div>
+    <div class="form-group">
+        <label asp-for="Course"></label>
+        <select asp-for="Course" class="form-control">
+            <option value="">-- Select Course --</option>
+            <option>BS Accountancy</option>
+            <option>BS Architecture</option>
+            <option>BS Business Administration</option>
+            <option>BS Civil Engineering</option>
+            <option>BS Computer Engineering</option>
+            <option>BS Computer Science</option>
+            <option>BS Criminology</option>
+            <option>BS Customs Administration</option>
+            <option>BS Electrical Engineering</option>
+            <option>BS Electronics Engineering (ECE)</option>
+            <option>
+                BS Electronics Technology
+
+            </option>
+            <option>BS Hospitality Management</option>
+            <option>BS Industrial Engineering</option>
+            <option>
+                BS Mechanical Engineering
+
+            </option>
+            <option>BS Nursing</option>
+            <option>BS Nutrition and Dietetics</option>
+            <option>BS Occupational Therapy</option>
+            <option>BS Pharmacy</option>
+            <option>BS Physical Therapy</option>
+            <option>BS Psychology</option>
+            <option>BS Tourism Management</option>
+            <option>AB Communication</option>
+            <option>AB Economics</option>
+            <option>AB English Language Studies</option>
+            <option>
+                AB Foreign Languages
+
+            </option>
+            <option>AB History</option>
+            <option>AB Journalism</option>
+            <option>AB Literature</option>
+            <option>AB Philosophy</option>
+            <option>AB Political Science</option>
+            <option>AB Psychology</option>
+            <option>AB Public Administration</option>
+            <option>AB Sociology</option>
+            <option>Bachelor of Early Childhood Education</option>
+            <option>
+                Bachelor of Elementary Education (BEEd)
+
+            </option>
+            <option>Bachelor of Fine Arts (BFA)</option>
+            <option>Bachelor of Interior Design</option>
+
+            <option>Bachelor of Laws (LLB) / Juris Doctor (JD)</option>
+            <option>Bachelor of Secondary Education (BSEd)</option>
+            <option>Bachelor of Special Needs Education</option>
+            <option>
+                Bachelor of Technical-Vocational Teacher Education
+
+            </option>
+			
+        </select>
+        <span asp-validation-for="Course" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Year"></label>
+        <select asp-for="Year" class="form-control">
+            <option value="">-- Select Year --</option>
+            <option>JHS - Grade 7</option>
+            <option>JHS - Grade 8</option>
+            <option>JHS - Grade 9</option>
+            <option>JHS - Grade 10</option>
+            <option>SHS - Grade 11</option>
+            <option>SHS - Grade 12</option>
+            <option>1st Year</option>
+            <option>2nd Year</option>
+            <option>3rd Year</option>
+            <option>4th Year</option>
+            <option>5th Year</option>
+        </select>
+        <span asp-validation-for="Year" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label>RFID UID</label>
+        <input asp-for="RFIDUID" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary mt-2">Register</button>
+</form>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const studentIdInput = document.querySelector('[name="StudentId"]');
+        studentIdInput.addEventListener("input", function (e) {
+            this.value = this.value.replace(/[a-zA-Z]/g, '');
+        });
+    });
+</script>

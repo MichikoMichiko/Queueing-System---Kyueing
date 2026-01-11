@@ -1,0 +1,151 @@
+﻿@model Kyueng.Models.QueueTicket
+
+@{
+    ViewData["Title"] = "Home";
+}
+
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
+
+<style>
+   
+
+    .card-box {
+        background-color: white;
+        border-radius: 1.5rem;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        padding: 3rem;
+        margin-bottom: 2.5rem;
+        max-width: 900px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .highlight-text {
+        color: #0078D4;
+        font-size: 4rem;
+        font-weight: 700;
+    }
+
+    #rfidInput {
+        font-size: 1.5rem;
+        padding: 1rem;
+        max-width: 500px;
+        width: 100%;
+        margin: 1.5rem auto 0;
+        border-radius: 12px;
+        display: block;
+        border: 1px solid #ccc;
+    }
+
+    form {
+        margin-top: 1rem;
+    }
+
+    h2 {
+        font-size: 2.5rem;
+        font-weight: 600;
+    }
+
+    p {
+        font-size: 1.25rem;
+    }
+
+    strong {
+        font-size: 1.5rem;
+    }
+
+    .text-muted {
+        font-size: 1.25rem;
+        color: #888;
+    }
+
+    .text-success {
+        font-size: 1.25rem;
+    }
+</style>
+
+<body>
+
+
+     <div class="text-center mb-4" style>
+        <img style="width:200px;" src="@Url.Content("~/img/src/image-removebg-preview (3).png")" />
+        </div>
+    <div class="card-box text-center">
+        <h2 class="mb-3">Now Serving</h2>
+        <div class="highlight-text" id="now-serving">
+            @(ViewBag.NowServing ?? "Waiting for next student...")
+        </div>
+
+        @if (ViewBag.NowServing != null && ViewBag.LastTicket != null && ViewBag.NowServing == ViewBag.LastTicket)
+        {
+            <p class="text-muted mt-2">Waiting for the next student to queue...</p>
+        }
+
+
+        <p class="mt-3">
+            Last Queue Number:
+            <strong id="last-ticket">
+                @(ViewBag.LastTicket ?? "Waiting...")
+            </strong>
+        </p>
+    </div>
+
+
+
+<div class="card-box text-center">
+        @* <p>@ViewBag.Greeting</p> *@
+
+    <h2 class="mb-3">Please tap your RFID to join the queue</h2>
+
+    <form id="rfidForm" asp-controller="Home" asp-action="TapRFID" method="post">
+        <input type="text" id="rfidInput" name="rfid" autofocus autocomplete="off" />
+    </form>
+
+    @if (ViewBag.Message != null)
+    {
+        <p class="mt-3 text-success">@ViewBag.Message</p>
+    }
+</div>
+
+
+<script>
+    const rfidInput = document.getElementById("rfidInput");
+
+    rfidInput.addEventListener("input", function () {
+        if (rfidInput.value.length >= 5) {
+            document.getElementById("rfidForm").submit();
+        }
+    });
+
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/queueHub")
+        .build();
+
+    connection.start().catch(err => console.error(err.toString()));
+
+    connection.on("UpdateLastTicket", function (ticketNumber) {
+        const display = document.getElementById("last-ticket");
+        if (display) {
+            display.textContent = ticketNumber;
+        }
+    });
+
+    connection.on("UpdateNowServing", function (ticketNumber) {
+        const nowServing = document.getElementById("now-serving");
+        if (nowServing) {
+            nowServing.textContent = ticketNumber;
+        }
+    });
+
+            connection.on("UpdateLastTicket", function (ticketNumber) {
+            const display = document.getElementById("last-ticket");
+            if (display) {
+                display.textContent = ticketNumber;
+            }
+        });
+
+
+</script>
+</body>

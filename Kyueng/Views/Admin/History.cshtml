@@ -1,0 +1,345 @@
+﻿@using System.Globalization
+@model List<Kyueng.Models.QueueCall>
+
+@{
+    ViewData["Title"] = "Call History";
+
+    var groupedByDate = Model
+        .GroupBy(c => c.CalledAt.Date)
+        .OrderByDescending(g => g.Key)
+        .ToList();
+
+    var allDates = groupedByDate.Select(g => g.Key).ToList();
+    var years = allDates.Select(d => d.Year).Distinct().OrderByDescending(y => y);
+    var months = allDates.Select(d => d.Month).Distinct().OrderBy(m => m);
+    var days = allDates.Select(d => d.Day).Distinct().OrderBy(d => d);
+}
+<style>
+    body {
+        background-color: #f1f4f9;
+    }
+
+    h2.fw-bold {
+        font-size: 1.75rem;
+        color: #2c3e50;
+    }
+
+    .form-control,
+    .form-select {
+        border-radius: 50px;
+        border: 1px solid #ced4da;
+        box-shadow: none;
+        transition: 0.3s ease;
+        padding-left: 1.2rem;
+        padding-right: 1.2rem;
+    }
+
+        .form-control:focus,
+        .form-select:focus,
+        .form-control:hover,
+        .form-select:hover {
+            border-color: #3498db;
+            box-shadow: 0 0 0 0.15rem rgba(52, 152, 219, 0.3);
+        }
+
+    .btn-outline-danger {
+        border-radius: 50px;
+        padding: 0.45rem 1.2rem;
+        color: #e74c3c;
+        border-color: #e74c3c;
+        font-weight: 500;
+        transition: 0.3s ease;
+    }
+
+        .btn-outline-danger i {
+            margin-right: 6px;
+        }
+
+        .btn-outline-danger:hover {
+            background-color: #e74c3c;
+            color: #fff;
+        }
+
+    .btn-secondary {
+        border-radius: 50px;
+        background-color: #95a5a6;
+        padding: 0.4rem 1rem;
+        border: none;
+    }
+
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+
+    .call-table {
+        background-color: #fff;
+        border-radius: 12px;
+        padding: 1.2rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        transition: background-color 0.3s ease;
+    }
+
+        .call-table h5 {
+            color: #2980b9;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+    .table thead {
+        background-color: #ecf0f1;
+    }
+
+    .table th {
+        font-weight: bold;
+        color: #2c3e50;
+    }
+
+    .table tbody tr {
+        transition: background-color 0.3s ease;
+    }
+
+        .table tbody tr:hover {
+            background-color: #eaf2fb;
+        }
+
+    .text-danger {
+        color: #e74c3c;
+    }
+
+    .modal-content {
+        border-radius: 12px;
+        background-color: #ffffff;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .modal-header {
+        background-color: #ecf0f1;
+        border-bottom: 1px solid #dcdcdc;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+    }
+
+    .modal-footer {
+        background-color: #f8f9fa;
+        border-top: 1px solid #dcdcdc;
+        border-bottom-left-radius: 12px;
+        border-bottom-right-radius: 12px;
+    }
+
+    .modal-body li {
+        padding: 4px 0;
+        color: #2c3e50;
+    }
+
+    .modal-title {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    .btn-close {
+        transition: transform 0.2s ease;
+    }
+
+        .btn-close:hover {
+            transform: scale(1.1);
+        }
+
+    .form-select option {
+        background-color: #fff;
+        color: #2c3e50;
+    }
+
+        .form-select option:hover {
+            background-color: #eaf2fb;
+        }
+
+    /* Modal centering + animation */
+    .modal.fade .modal-dialog {
+        transform: translateY(-20%);
+        transition: transform 0.3s ease-out, opacity 0.3s ease-in-out;
+    }
+
+    .modal.show .modal-dialog {
+        transform: translateY(0);
+    }
+
+    .modal-content {
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-dialog {
+        margin-top: 10vh;
+    }
+
+</style>
+
+
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold"><i class="fas fa-history me-2 text-primary"></i>Call History</h2>
+    <button class="btn btn-outline-danger" onclick="printPDF()">Export to PDF</button>
+</div>
+
+<div class="input-group" style="max-width: 350px; margin-bottom: 20px;">
+    
+       
+    
+    <input type="text" id="searchInput" class="form-control shadow-sm border-start-0 rounded-pill" placeholder="Search..." onkeyup="searchTable()" />
+</div>
+
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <select id="yearSelect" class="form-select shadow-sm" onchange="filterDate()">
+            <option value="">📅 Filter by Year</option>
+            @foreach (var y in years)
+            {
+                <option value="@y">@y</option>
+            }
+        </select>
+
+    </div>
+    <div class="col-md-4">
+        <select id="monthSelect" class="form-select shadow-sm" onchange="filterDate()">
+            <option value="">Filter by Month</option>
+            @foreach (var m in months)
+            {
+                <option value="@m">@CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(m)</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-4">
+        <select id="daySelect" class="form-select shadow-sm" onchange="filterDate()">
+            <option value="">Filter by Day</option>
+            @foreach (var d in days)
+            {
+                <option value="@d">@d.ToString("D2")</option>
+            }
+        </select>
+    </div>
+</div>
+
+@foreach (var group in groupedByDate)
+{
+    var id = $"calls-{group.Key:yyyy-MM-dd}";
+    <div id="@id" class="call-table mb-5">
+        <h5 class="text-primary border-bottom pb-1">
+            @group.Key.ToString("D") - <span class="text-muted">Total: @group.Count()</span>
+        </h5>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Ticket #</th>
+                        <th>Student</th>
+                        <th>Called At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var call in group)
+                    {
+                        var student = call.QueueTicket?.Student;
+                        var modalId = $"modal-{call.Id}";
+                        var deleted = student == null;
+                        var studentName = deleted ? "Deleted Student" : student.FullName;
+                        var rowClass = deleted ? "text-danger" : "";
+                        <tr class="@rowClass">
+                            <td>@call.QueueTicket?.TicketNumber</td>
+                            <td style="cursor: pointer;" onclick="showStudentModal('@modalId')">
+                                @studentName
+                            </td>
+                            <td>@call.CalledAt.ToString("g")</td>
+                        </tr>
+                    
+
+
+                        <!-- Modal -->
+                        
+
+
+                        <div class="modal fade" id="modal-@call.Id" tabindex="-1" aria-labelledby="modalLabel-@call.Id" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="@modalId-label">Student Info</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        @if (student != null)
+                                        {
+                                            <ul class="list-unstyled">
+                                                <li><strong>Full Name:</strong> @student.FullName</li>
+                                                <li><strong>Email:</strong> @student.Email</li>
+                                                <li><strong>Course:</strong> @student.Course</li>
+                                                <li><strong>Year:</strong> @student.Year</li>
+                                                <li><strong>RFID:</strong> @student.RFIDUID</li>
+                                                <li><strong>Student ID:</strong> @student.StudentId</li>
+                                            </ul>
+                                        }
+                                        else
+                                        {
+                                            <div class="text-danger">
+                                                <p><strong>This student record has been deleted.</strong></p>
+                                            </div>
+                                        }
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        function filterDate() {
+            const y = document.getElementById('yearSelect').value;
+            const m = document.getElementById('monthSelect').value.padStart(2, '0');
+            const d = document.getElementById('daySelect').value.padStart(2, '0');
+            const full = `${y}-${m}-${d}`;
+            document.querySelectorAll('.call-table').forEach(div => {
+                div.style.display = div.id === `calls-${full}` ? 'block' : 'none';
+            });
+        }
+
+        function searchTable() {
+            const input = document.getElementById("searchInput").value.toLowerCase();
+            const tables = document.querySelectorAll(".call-table");
+            let anyMatch = false;
+
+            tables.forEach(table => {
+                let matchFound = false;
+                table.querySelectorAll("tbody tr").forEach(row => {
+                    const rowText = row.innerText.toLowerCase();
+                    const isMatch = rowText.includes(input);
+                    row.style.display = isMatch ? "" : "none";
+                    if (isMatch) matchFound = true;
+                });
+
+                table.style.display = matchFound ? "block" : "none";
+                if (matchFound) anyMatch = true;
+            });
+
+            if (!anyMatch && input.trim()) {
+                console.log("No matches found.");
+            }
+        }
+
+        function printPDF() {
+            window.print();
+        }
+
+        function showStudentModal(id) {
+            const modal = new bootstrap.Modal(document.getElementById(id));
+            modal.show();
+        }
+    </script>
+}

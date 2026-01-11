@@ -1,0 +1,132 @@
+﻿@model Kyueng.Models.Student
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+
+<form id="editStudentForm" method="post" asp-action="Edit">
+    <input type="hidden" name="Id" value="@Model.Id" />
+
+    <div class="modal-header">
+        <h5 class="modal-title">Student Information</h5>
+       
+    </div>
+
+
+
+    <div class="modal-body">
+        <div class="form-group">
+            <label asp-for="StudentId" class="form-label"></label>
+            <input asp-for="StudentId" class="form-control" />
+            <span class="text-danger" data-valmsg-for="StudentId"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Full Name</label>
+            <input asp-for="FullName" class="form-control" />
+            <span asp-validation-for="FullName" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Course </label>
+            <select asp-for="Course" class="form-control">
+                <option value="">-- Select Course --</option>
+                <option value="">-- Select Course --</option>
+                <option>BS Accountancy</option>
+                <option>BS Architecture</option>
+                <option>BS Business Administration</option>
+                <option>BS Civil Engineering</option>
+                <option>BS Computer Engineering</option>
+                <option>BS Computer Science</option>
+                <option>BS Criminology</option>
+                <option>BS Customs Administration</option>
+                <option>BS Electrical Engineering</option>
+                <option>BS Electronics Engineering (ECE)</option>
+                <option>
+                    BS Electronics Technology
+
+                </option>
+                <option>BS Hospitality Management</option>
+                <option>BS Industrial Engineering</option>
+                <option>
+                    BS Mechanical Engineering
+
+                </option>
+                <option>BS Nursing</option>
+                <option>BS Nutrition and Dietetics</option>
+                <option>BS Occupational Therapy</option>
+                <option>BS Pharmacy</option>
+                <option>BS Physical Therapy</option>
+                <option>BS Psychology</option>
+                <option>BS Tourism Management</option>
+                <option>AB Communication</option>
+                <option>AB Economics</option>
+                <option>AB English Language Studies</option>
+                <option>
+                    AB Foreign Languages
+
+                </option>
+                <option>AB History</option>
+                <option>AB Journalism</option>
+                <option>AB Literature</option>
+                <option>AB Philosophy</option>
+                <option>AB Political Science</option>
+                <option>AB Psychology</option>
+                <option>AB Public Administration</option>
+                <option>AB Sociology</option>
+                <option>Bachelor of Early Childhood Education</option>
+                <option>
+                    Bachelor of Elementary Education (BEEd)
+
+                </option>
+                <option>Bachelor of Fine Arts (BFA)</option>
+                <option>Bachelor of Interior Design</option>
+
+                <option>Bachelor of Laws (LLB) / Juris Doctor (JD)</option>
+                <option>Bachelor of Secondary Education (BSEd)</option>
+                <option>Bachelor of Special Needs Education</option>
+                <option>
+                    Bachelor of Technical-Vocational Teacher Education
+
+                </option>
+            </select>
+            <span asp-validation-for="Course" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Year</label>
+            <select asp-for="Year" class="form-control">
+                <option value="">-- Select Year --</option>
+                <option>JHS - Grade 7</option>
+                <option>JHS - Grade 8</option>
+                <option>JHS - Grade 9</option>
+                <option>JHS - Grade 10</option>
+                <option>SHS - Grade 11</option>
+                <option>SHS - Grade 12</option>
+                <option>1st Year</option>
+                <option>2nd Year</option>
+                <option>3rd Year</option>
+                <option>4th Year</option>
+                <option>5th Year</option>
+            </select>
+            <span asp-validation-for="Year" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="RFIDUID" class="form-label"></label>
+            <input asp-for="RFIDUID" class="form-control" />
+            <span asp-validation-for="RFIDUID" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-success">Save Changes</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+    </div>
+</form>
+
+
